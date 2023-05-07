@@ -7,6 +7,7 @@ image_path = ""
 result = "No Image Was Selected"
 
 def main(page:ft.Page):
+    
     page.title = "Virus Classification"
     page.window_width = 600
     page.window_height = 700

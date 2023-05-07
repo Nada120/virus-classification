@@ -128,4 +128,4 @@ def neural():
     print(n)
     # text = 
 
-neural()    
+#neural()    
