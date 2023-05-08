@@ -1,4 +1,4 @@
-import functions.functions as function
+import functions.functions as fn
 import flet as ft
 import base64
 import os
@@ -12,7 +12,6 @@ def main(page:ft.Page):
     page.window_width = 600
     page.window_height = 700
     page.padding = 0
-    
     
     image_holder = ft.Image(
         width = 380,
@@ -29,7 +28,6 @@ def main(page:ft.Page):
                 global image_path
                 image_path = str(e.files[0].path)
                 image_holder.src_base64 = base64.b64encode(r.read()).decode('utf-8')           
-                print("The path is: "+image_path)
                 page.update()
 
     pick_file = ft.FilePicker(on_result=pick_files_result)
@@ -37,22 +35,24 @@ def main(page:ft.Page):
     
     # The process   
     def process(e: ft.TapEvent):
-        result = "Here is the result"
+        print("The path is: "+image_path)
+        text = fn.neural(image_path)
+        print(f'hereeeee: '+text)
         show_result.content = ft.Text(
-            result,
+            text,
             size = 20,
             color = "white",
             weight = ft.FontWeight.W_500,
         )
+        page.update()
         show_details.content = ft.Text(
-            function.details(image_path),
+            fn.details(text),
             size = 18,
             color = "white",
             weight = ft.FontWeight.W_500,
         )
         show_details.height = 400,
         page.update()
-        function.start(image_path)
 
     show_result = ft.Container(
         content = ft.Text(
@@ -125,6 +125,7 @@ def main(page:ft.Page):
         )
       )
     )
+    page.update()
 ft.app(target=main, assets_dir="project")
 
 

@@ -10,37 +10,32 @@ bias = np.array([])
 image = ''
 text = "Type is : ???"
 
+def read_image(path):
+    global P
+    x = get_feature(cv2.imread(os.path.abspath(path),cv2.IMREAD_GRAYSCALE)) 
+    P.append(x)
+
 def start():
-    
-    #vector = get_feature(cv2.imread(image,cv2.IMREAD_GRAYSCALE))
-    #print(vector)
     global weights, T, P
-    for i in range(2):
-        P.append( get_feature(cv2.imread(os.path.abspath("media/virues images/Adenovirus/p."+str(i)+".jpg"),cv2.IMREAD_GRAYSCALE)) )
+    for i in range(10):
+        read_image(os.path.abspath("media/virues images/Adenovirus/p."+str(i)+".jpg"))
         T.append([1, 1, -1])
-        P.append( get_feature(cv2.imread(os.path.abspath("media/virues images/Astrovirus/p."+str(i)+".jpg"),cv2.IMREAD_GRAYSCALE)) )
+        read_image(os.path.abspath("media/virues images/Astrovirus/p."+str(i)+".jpg"))
         T.append([1, -1, 1])
-        P.append( get_feature(cv2.imread(os.path.abspath("media/virues images/Ebola/p."+str(i)+".jpg"),cv2.IMREAD_GRAYSCALE)) )
+        read_image(os.path.abspath("media/virues images/Ebola/p."+str(i)+".jpg"))
         T.append([1, 1, 1])
-        P.append( get_feature(cv2.imread(os.path.abspath("media/virues images/Influenza/p."+str(i)+".jpg"),cv2.IMREAD_GRAYSCALE)) )
+        read_image(os.path.abspath("media/virues images/Influenza/p."+str(i)+".jpg"))
         T.append([-1, -1, -1])
-        P.append( get_feature(cv2.imread(os.path.abspath("media/virues images/Machupo/p."+str(i)+".jpg"),cv2.IMREAD_GRAYSCALE)) )
+        read_image(os.path.abspath("media/virues images/Machupo/p."+str(i)+".jpg"))
         T.append([-1, 1, -1])       
-    
-    P = np.array(P)
     print(P)
-    T = np.array(T) 
-    #T = np.transpose(T)
-    weights = np.dot(T, np.dot(np.linalg.inv(np.dot(P, P.T)), P))
-    print(weights) 
+    P = np.array(P)
+    T = np.transpose(T)
+    weights = np.dot(T, np.dot(np.linalg.inv(np.dot(P, P.T)),P))
 ###################################################  
 
 def get_feature(image):
     new = conv_relu(image)
-    new = pooling(new)
-    new = conv_relu(new)
-    new = pooling(new)
-    new = conv_relu(new)
     new = pooling(new)
     new = conv_relu(new)
     new = pooling(new)
@@ -92,40 +87,50 @@ def flatten(image):
 
 ###################################################
 
-def details(image):
+def details(name):
     
-    path = os.path.dirname(image)
-    folder_name = os.path.basename(path)
-    print(folder_name)
-
-    if (folder_name == 'Adenovirus'):
+    if (name == 'Adenovirus'):
         return """A members of the family Adenoviridae, are medium-sized (90:100 nm), nonenveloped (without an outer lipid bilayer) viruses with an icosahedral nucleocapsid containing a double-stranded DNA genome.
         """
-    if (folder_name == 'Astrovirus'):
+    if (name == 'Astrovirus'):
         return """A type of virus that was first discovered in 1975 using electron microscopes following an outbreak of diarrhea in humans. In addition to humans, astroviruses have now been isolated from numerous mammalian animal species.
         """
-    if (folder_name == 'Ebola'):
+    if (name == 'Ebola'):
         return """Known as Ebola virus disease (EVD) and Ebola hemorrhagic fever (EHF), is a viral hemorrhagic fever in humans and other primates,caused by ebolaviruses.
         """
-    if (folder_name == 'Influenza'):
+    if (name == 'Influenza'):
         return """Commonly known as "the flu", is an infectious disease caused by influenza viruses. Symptoms range from mild to severe and often include fever, runny nose, sore throat, muscle pain, headache, coughing, and fatigue.
         """
-    if (folder_name == 'Machupo'):
+    if (name == 'Machupo'):
         return """Also known as black typhus or Ordog Fever, is a hemorrhagic fever and zoonotic infectious disease originating in Bolivia after infection by Machupo mammarenavirus.
         """        
     else:
         return None
 ###################################################
 
-def neural():
-    start()
+def neural(img_path):
     global image, weights, text
-    p = np.array(get_feature(cv2.imread('F:/virus_classification_materials/project/media/virues images/Adenovirus/p.2.jpg',cv2.IMREAD_GRAYSCALE)))
-    p = p.T
+    x  = get_feature(cv2.imread(os.path.abspath(img_path),cv2.IMREAD_GRAYSCALE)) 
+    p = np.transpose(x)
     print(p)
     print(weights)
     n = np.dot(weights, p)
+    for i in range(3):
+        if(n[i] >= 0):
+            n[i] = 1
+        else:
+            n[i] = -1
+    n = np.array(n) 
     print(n)
-    # text = 
-
-#neural()    
+    if (np.array_equal(n, [1, 1, -1])):
+        return 'Adenovirus'
+    elif (np.array_equal(n, [1, -1, 1])):
+        return 'Astrovirus'
+    elif (np.array_equal(n, [1, 1, 1])):
+        return 'Ebola'
+    elif (np.array_equal(n, [-1, -1, -1])):
+        return 'Influenza'
+    elif (np.array_equal(n, [-1, 1, -1])):
+        return 'Machupo'
+    return ''
+start()
