@@ -37,7 +37,7 @@ def main(page:ft.Page):
     def process(e: ft.TapEvent):
         print("The path is: "+image_path)
         text = fn.neural(image_path)
-        print(f'hereeeee: '+text)
+        print(f'here: '+text)
         show_result.content = ft.Text(
             text,
             size = 20,
